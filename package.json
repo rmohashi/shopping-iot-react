@@ -54,7 +54,6 @@
   ],
   "devDependencies": {
     "eslint-config-prettier": "4.0.0",
-    "eslint-plugin-prettier": "3.0.1",
-    "dotenv": "7.0.0"
+    "eslint-plugin-prettier": "3.0.1"
   }
 }

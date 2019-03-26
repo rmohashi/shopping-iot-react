@@ -4,7 +4,6 @@ import { createBrowserHistory } from "history";
 import { Router, Route, Switch, Redirect } from "react-router-dom";
 import { ApolloProvider } from "react-apollo";
 import ApolloClient from "apollo-boost";
-import dotenv from "dotenv";
 
 // core components
 import Admin from "layouts/Admin.jsx";
@@ -15,10 +14,8 @@ import "assets/css/material-dashboard-react.css?v=1.6.0";
 const hist = createBrowserHistory();
 
 const graphqlClient = new ApolloClient({
-  uri: "http://localhost:4000/graphql"
+  uri: process.env.REACT_APP_GRAPHQL_URI
 });
-
-dotenv.config();
 
 ReactDOM.render(
   <ApolloProvider client={graphqlClient}>

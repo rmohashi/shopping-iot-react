@@ -76,7 +76,7 @@ class Dashboard extends React.Component {
                 <p className={classes.cardCategory}>Consumo Total</p>
                 <Query
                   query={GET_CURRENT_POWER_CONSUMPTION}
-                  pollInterval={5000}
+                  pollInterval={2000}
                 >
                   {({ loading, error, data }) => {
                     if (loading) return "Loading...";
