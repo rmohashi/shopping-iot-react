@@ -13,7 +13,7 @@ import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import AccessTime from "@material-ui/icons/AccessTime";
-import Accessibility from "@material-ui/icons/Accessibility";
+import Battery80 from "@material-ui/icons/Battery80";
 import BugReport from "@material-ui/icons/BugReport";
 import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
@@ -40,6 +40,17 @@ import {
 
 import dashboardStyle from "assets/jss/material-dashboard-react/views/dashboardStyle.jsx";
 
+import gql from "graphql-tag";
+import { Query } from "react-apollo";
+
+const GET_CURRENT_POWER_CONSUMPTION = gql`
+  {
+    CurrentPowerConsumption {
+      measurement
+    }
+  }
+`;
+
 class Dashboard extends React.Component {
   state = {
     value: 0
@@ -56,6 +67,38 @@ class Dashboard extends React.Component {
     return (
       <div>
         <GridContainer>
+          <GridItem xs={12} sm={6} md={3}>
+            <Card>
+              <CardHeader color="info" stats icon>
+                <CardIcon color="info">
+                  <Battery80 />
+                </CardIcon>
+                <p className={classes.cardCategory}>Consumo Total</p>
+                <Query
+                  query={GET_CURRENT_POWER_CONSUMPTION}
+                  pollInterval={5000}
+                >
+                  {({ loading, error, data }) => {
+                    if (loading) return "Loading...";
+                    if (error) return `Error! ${error.message}`;
+
+                    return (
+                      <h3 className={classes.cardTitle}>
+                        {data.CurrentPowerConsumption.measurement}
+                        &nbsp;<small>W</small>
+                      </h3>
+                    );
+                  }}
+                </Query>
+              </CardHeader>
+              <CardFooter stats>
+                <div className={classes.stats}>
+                  <Update />
+                  Atualizado
+                </div>
+              </CardFooter>
+            </Card>
+          </GridItem>
           <GridItem xs={12} sm={6} md={3}>
             <Card>
               <CardHeader color="warning" stats icon>
@@ -109,23 +152,6 @@ class Dashboard extends React.Component {
                 <div className={classes.stats}>
                   <LocalOffer />
                   Tracked from Github
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="info" stats icon>
-                <CardIcon color="info">
-                  <Accessibility />
-                </CardIcon>
-                <p className={classes.cardCategory}>Followers</p>
-                <h3 className={classes.cardTitle}>+245</h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <Update />
-                  Just Updated
                 </div>
               </CardFooter>
             </Card>
