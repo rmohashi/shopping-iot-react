@@ -9,13 +9,13 @@ import Icon from "@material-ui/core/Icon";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
-import ArrowUpward from "@material-ui/icons/ArrowUpward";
+// import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import AccessTime from "@material-ui/icons/AccessTime";
 import Battery80 from "@material-ui/icons/Battery80";
-import BugReport from "@material-ui/icons/BugReport";
+// import BugReport from "@material-ui/icons/BugReport";
 import CalendarViewDay from "@material-ui/icons/CalendarViewDay";
-import Code from "@material-ui/icons/Code";
-import Cloud from "@material-ui/icons/Cloud";
+// import Code from "@material-ui/icons/Code";
+// import Cloud from "@material-ui/icons/Cloud";
 // core components
 import GridItem from "components/Grid/GridItem.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
@@ -53,6 +53,30 @@ const GET_LAST_MONTH_CONSUMPTION = gql`
   {
     LabsoftLastMonthConsumption {
       measurement
+    }
+  }
+`;
+
+const GET_CURRENT_MONTH_BILL_PREVIEW = gql`
+  {
+    LabsoftCurrentMonthBillPreview {
+      month
+      value
+    }
+  }
+`;
+
+const GET_DAILY_CONSUMPTION = gql`
+  {
+    LabsoftLastMonthDailyConsumption {
+      averageConsumption {
+          labels
+          series
+      }
+      peakConsumption {
+        labels
+        series
+      }
     }
   }
 `;
@@ -140,97 +164,109 @@ class Dashboard extends React.Component {
                 <CardIcon color="danger">
                   <Icon>info_outline</Icon>
                 </CardIcon>
-                <p className={classes.cardCategory}>Fixed Issues</p>
-                <h3 className={classes.cardTitle}>75</h3>
+                <p className={classes.cardCategory}>Previsão da Conta de Luz</p>
+                <Query query={GET_CURRENT_MONTH_BILL_PREVIEW}>
+                  {({ loading, error, data }) => {
+                    if (loading) return "Loading...";
+                    if (error) return `Error! ${error.message}`;
+
+                    return (
+                      <h3 className={classes.cardTitle}>
+                        <small>R$</small> {data.LabsoftCurrentMonthBillPreview.value.toFixed(2).replace(".", ",")}
+                        &nbsp;
+                      </h3>
+                    );
+                  }}
+                </Query>
               </CardHeader>
               <CardFooter stats>
                 <div className={classes.stats}>
                   <LocalOffer />
-                  Tracked from Github
+                  Baseado na média dos últimos dias
                 </div>
               </CardFooter>
             </Card>
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12} sm={12} md={4}>
+          <GridItem xs={12} sm={12} md={12}>
             <Card chart>
               <CardHeader color="success">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={dailySalesChart.data}
-                  type="Line"
-                  options={dailySalesChart.options}
-                  listener={dailySalesChart.animation}
-                />
+              <Query query={GET_DAILY_CONSUMPTION}>
+                  {({ loading, error, data }) => {
+                    if (loading) return "Loading...";
+                    if (error) return `Error! ${error.message}`;
+
+                    return (
+                      <ChartistGraph
+                        className="ct-chart"
+                        data={{
+                          labels: data.LabsoftLastMonthDailyConsumption.averageConsumption.labels,
+                          series: [data.LabsoftLastMonthDailyConsumption.averageConsumption.series]
+                        }}
+                        type="Line"
+                        options={dailySalesChart.options}
+                        listener={dailySalesChart.animation}
+                      />
+                    );
+                  }}
+                </Query>
               </CardHeader>
               <CardBody>
-                <h4 className={classes.cardTitle}>Daily Sales</h4>
+                <h4 className={classes.cardTitle}>Média de consumo diário</h4>
                 <p className={classes.cardCategory}>
-                  <span className={classes.successText}>
+                  {/* <span className={classes.successText}>
                     <ArrowUpward className={classes.upArrowCardCategory} /> 55%
-                  </span>{" "}
-                  increase in today sales.
+                  </span>{" "} */}
+                  Com base nos dados do mês passado. em kWh
                 </p>
               </CardBody>
               <CardFooter chart>
                 <div className={classes.stats}>
-                  <AccessTime /> updated 4 minutes ago
+                  <AccessTime /> Atualizado
                 </div>
               </CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={12} md={4}>
+          <GridItem xs={12} sm={12} md={12}>
             <Card chart>
               <CardHeader color="warning">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={emailsSubscriptionChart.data}
-                  type="Bar"
-                  options={emailsSubscriptionChart.options}
-                  responsiveOptions={emailsSubscriptionChart.responsiveOptions}
-                  listener={emailsSubscriptionChart.animation}
-                />
+                <Query query={GET_DAILY_CONSUMPTION}>
+                  {({ loading, error, data }) => {
+                    if (loading) return "Loading...";
+                    if (error) return `Error! ${error.message}`;
+
+                    return (
+                      <ChartistGraph
+                        className="ct-chart"
+                        data={{
+                          labels: data.LabsoftLastMonthDailyConsumption.peakConsumption.labels,
+                          series: [data.LabsoftLastMonthDailyConsumption.peakConsumption.series]
+                        }}
+                        type="Bar"
+                        options={emailsSubscriptionChart.options}
+                        responsiveOptions={emailsSubscriptionChart.responsiveOptions}
+                        listener={emailsSubscriptionChart.animation}
+                      />
+                    );
+                  }}
+                </Query>
               </CardHeader>
               <CardBody>
-                <h4 className={classes.cardTitle}>Email Subscriptions</h4>
+                <h4 className={classes.cardTitle}>Picos de consumo diários</h4>
                 <p className={classes.cardCategory}>
-                  Last Campaign Performance
+                  Baseado nos dias do último mês, em kW
                 </p>
               </CardBody>
               <CardFooter chart>
                 <div className={classes.stats}>
-                  <AccessTime /> campaign sent 2 days ago
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={12} md={4}>
-            <Card chart>
-              <CardHeader color="danger">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={completedTasksChart.data}
-                  type="Line"
-                  options={completedTasksChart.options}
-                  listener={completedTasksChart.animation}
-                />
-              </CardHeader>
-              <CardBody>
-                <h4 className={classes.cardTitle}>Completed Tasks</h4>
-                <p className={classes.cardCategory}>
-                  Last Campaign Performance
-                </p>
-              </CardBody>
-              <CardFooter chart>
-                <div className={classes.stats}>
-                  <AccessTime /> campaign sent 2 days ago
+                <Update /> Valores atualizados
                 </div>
               </CardFooter>
             </Card>
           </GridItem>
         </GridContainer>
-        <GridContainer>
+        {/* <GridContainer>
           <GridItem xs={12} sm={12} md={6}>
             <CustomTabs
               title="Tasks:"
@@ -294,7 +330,7 @@ class Dashboard extends React.Component {
               </CardBody>
             </Card>
           </GridItem>
-        </GridContainer>
+        </GridContainer> */}
       </div>
     );
   }
