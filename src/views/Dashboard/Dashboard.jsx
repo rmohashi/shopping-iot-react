@@ -6,8 +6,6 @@ import ChartistGraph from "react-chartist";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
-import Warning from "@material-ui/icons/Warning";
 import DateRange from "@material-ui/icons/DateRange";
 import LocalOffer from "@material-ui/icons/LocalOffer";
 import Update from "@material-ui/icons/Update";
@@ -15,6 +13,7 @@ import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import AccessTime from "@material-ui/icons/AccessTime";
 import Battery80 from "@material-ui/icons/Battery80";
 import BugReport from "@material-ui/icons/BugReport";
+import CalendarViewDay from "@material-ui/icons/CalendarViewDay";
 import Code from "@material-ui/icons/Code";
 import Cloud from "@material-ui/icons/Cloud";
 // core components
@@ -23,7 +22,6 @@ import GridContainer from "components/Grid/GridContainer.jsx";
 import Table from "components/Table/Table.jsx";
 import Tasks from "components/Tasks/Tasks.jsx";
 import CustomTabs from "components/CustomTabs/CustomTabs.jsx";
-import Danger from "components/Typography/Danger.jsx";
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardIcon from "components/Card/CardIcon.jsx";
@@ -51,6 +49,14 @@ const GET_CURRENT_POWER_CONSUMPTION = gql`
   }
 `;
 
+const GET_LAST_MONTH_CONSUMPTION = gql`
+  {
+    LabsoftLastMonthConsumption {
+      measurement
+    }
+  }
+`;
+
 class Dashboard extends React.Component {
   state = {
     value: 0
@@ -67,13 +73,13 @@ class Dashboard extends React.Component {
     return (
       <div>
         <GridContainer>
-          <GridItem xs={12} sm={6} md={3}>
+          <GridItem xs={12} sm={12} md={4}>
             <Card>
-              <CardHeader color="info" stats icon>
-                <CardIcon color="info">
+              <CardHeader color="primary" stats icon>
+                <CardIcon color="primary">
                   <Battery80 />
                 </CardIcon>
-                <p className={classes.cardCategory}>Consumo Total</p>
+                <p className={classes.cardCategory}>Consumo Atual</p>
                 <Query
                   query={GET_CURRENT_POWER_CONSUMPTION}
                   pollInterval={2000}
@@ -99,47 +105,36 @@ class Dashboard extends React.Component {
               </CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
+          <GridItem xs={12} sm={6} md={4}>
             <Card>
-              <CardHeader color="warning" stats icon>
-                <CardIcon color="warning">
-                  <Icon>content_copy</Icon>
+              <CardHeader color="info" stats icon>
+                <CardIcon color="info">
+                  <CalendarViewDay />
                 </CardIcon>
-                <p className={classes.cardCategory}>Used Space</p>
-                <h3 className={classes.cardTitle}>
-                  49/50 <small>GB</small>
-                </h3>
-              </CardHeader>
-              <CardFooter stats>
-                <div className={classes.stats}>
-                  <Danger>
-                    <Warning />
-                  </Danger>
-                  <a href="#pablo" onClick={e => e.preventDefault()}>
-                    Get more space
-                  </a>
-                </div>
-              </CardFooter>
-            </Card>
-          </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
-            <Card>
-              <CardHeader color="success" stats icon>
-                <CardIcon color="success">
-                  <Store />
-                </CardIcon>
-                <p className={classes.cardCategory}>Revenue</p>
-                <h3 className={classes.cardTitle}>$34,245</h3>
+                <p className={classes.cardCategory}>Consumo Total do último mês</p>
+                <Query query={GET_LAST_MONTH_CONSUMPTION}>
+                  {({ loading, error, data }) => {
+                    if (loading) return "Loading...";
+                    if (error) return `Error! ${error.message}`;
+
+                    return (
+                      <h3 className={classes.cardTitle}>
+                        {data.LabsoftLastMonthConsumption.measurement.toFixed(2).replace(".", ",")}
+                        &nbsp;<small>kWh</small>
+                      </h3>
+                    );
+                  }}
+                </Query>
               </CardHeader>
               <CardFooter stats>
                 <div className={classes.stats}>
                   <DateRange />
-                  Last 24 Hours
+                  Últimos 30 dias
                 </div>
               </CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={6} md={3}>
+          <GridItem xs={12} sm={6} md={4}>
             <Card>
               <CardHeader color="danger" stats icon>
                 <CardIcon color="danger">
