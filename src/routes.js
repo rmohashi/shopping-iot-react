@@ -33,7 +33,7 @@ const dashboardRoutes = [
   // },
   {
     path: "/table",
-    name: "Table List",
+    name: "Consumo",
     rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: TableList,
