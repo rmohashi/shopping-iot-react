@@ -74,7 +74,7 @@ function TableList(props) {
                     tableHeaderColor="primary"
                     tableHead={["No", "Mês", "Consumo"]}
                     tableData={data.LabsoftMonthConsumption.map((singleData, index) => {
-                      return [index + 1, singleData.month, `${singleData.average.toFixed(2)} kWh`];
+                      return [index + 1, singleData.month, `${singleData.average.toFixed(2).replace(".", ",")} kWh`];
                     })}
                   />
                 );
